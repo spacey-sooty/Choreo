@@ -253,10 +253,9 @@ public class Choreo {
 
   /**
    * Returns a Trigger which activates at a certain time since starting on a ChoreoTrajectory, then
-   * deactivates at a point in time after that.
+   * deactivates at a point in time after that. The generated Triggers will not stop firing even
+   * when the robot starts on another ChoreoTrajectory.
    *
-   * @implNote The following Triggers will not stop firing even when the robot starts on another
-   *     ChoreoTrajectory.
    * @param trajName The file name (without the .traj) of the given trajectory.
    * @param risingEdge The time since the robot has started on the trajectory trajName, in seconds,
    *     that the trigger should begin to fire.
@@ -279,10 +278,9 @@ public class Choreo {
 
   /**
    * Returns a Trigger which activates for a certain period of time after the robot hits an event
-   * marker.
+   * marker. The created Triggers will not stop firing even when the robot starts on another
+   * ChoreoTrajectory.
    *
-   * @implNote The following Triggers will not stop firing even when the robot starts on another
-   *     ChoreoTrajectory.
    * @param trajName The file name (without the .traj) of the given trajectory.
    * @param offset The time in seconds between when the inputted trajectory is started and when the
    *     event trigger should fire.
