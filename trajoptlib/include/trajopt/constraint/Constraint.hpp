@@ -3,13 +3,13 @@
 #pragma once
 
 #include <concepts>
-#include <type_traits>
 #include <variant>
 
 #include <sleipnir/autodiff/Variable.hpp>
 #include <sleipnir/optimization/OptimizationProblem.hpp>
 
 #include "trajopt/constraint/AngularVelocityMaxMagnitudeConstraint.hpp"
+#include "trajopt/constraint/LaneConstraint.hpp"
 #include "trajopt/constraint/LinePointConstraint.hpp"
 #include "trajopt/constraint/LinearAccelerationMaxMagnitudeConstraint.hpp"
 #include "trajopt/constraint/LinearVelocityDirectionConstraint.hpp"
@@ -57,6 +57,7 @@ static_assert(ConstraintType<PointLineConstraint>);
 static_assert(ConstraintType<PointPointConstraint>);
 static_assert(ConstraintType<PoseEqualityConstraint>);
 static_assert(ConstraintType<TranslationEqualityConstraint>);
+static_assert(ConstraintType<LaneConstraint>);
 
 using Constraint =
     std::variant<AngularVelocityMaxMagnitudeConstraint, LinePointConstraint,
