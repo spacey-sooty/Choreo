@@ -4,6 +4,7 @@ use std::{path::PathBuf, process::exit};
 use choreo_core::{
     file_management::{self, WritingResources},
     generation::generate::generate,
+    tokio::task::JoinHandle,
     ChoreoError,
 };
 use clap::Parser;
@@ -170,49 +171,112 @@ impl Cli {
             return;
         }
 
-        // generate trajectories
-        for (i, trajectory_name) in trajectory_names.iter().enumerate() {
-            tracing::info!(
-                "Generating trajectory {:} for {:}",
-                trajectory_name,
-                project.name
-            );
+        let max_threads = usize::from(std::thread::available_parallelism().unwrap());
+        let num = trajectory_names.len();
+        if max_threads > num {
+            let mut threads: Vec<JoinHandle<()>> = vec![];
+            let mut count = 0;
+            for trajectory_name in trajectory_names {
+                count += 1;
+                let i = count.clone();
+                let resources = resources.clone();
+                let project = project.clone();
+                threads.push(choreo_core::tokio::spawn(async move {
+                    tracing::info!(
+                        "Generating trajectory {:} for {:}",
+                        trajectory_name,
+                        project.name
+                    );
 
-            let trajectory =
-                file_management::read_trajectory_file(&resources, trajectory_name.to_string())
+                    let trajectory = file_management::read_trajectory_file(
+                        &resources,
+                        trajectory_name.to_string(),
+                    )
                     .await
                     .expect("Failed to read trajectory file");
 
-            match generate(project.clone(), trajectory, i as i64) {
-                Ok(new_trajectory) => {
-                    match file_management::write_trajectory_file_immediately(
-                        &resources,
-                        new_trajectory,
-                    )
-                    .await
-                    {
-                        Ok(_) => {
-                            tracing::info!(
-                                "Successfully generated trajectory {:} for {:}",
-                                trajectory_name,
-                                project.name
-                            );
+                    match generate(project.clone(), trajectory, i as i64) {
+                        Ok(new_trajectory) => {
+                            match file_management::write_trajectory_file_immediately(
+                                &resources,
+                                new_trajectory,
+                            )
+                            .await
+                            {
+                                Ok(_) => {
+                                    tracing::info!(
+                                        "Successfully generated trajectory {:} for {:}",
+                                        trajectory_name,
+                                        project.name
+                                    );
+                                }
+                                Err(e) => {
+                                    tracing::error!(
+                                        "Failed to write trajectory {:} for {:}: {:}",
+                                        trajectory_name,
+                                        project.name,
+                                        e
+                                    );
+                                }
+                            }
                         }
                         Err(e) => {
                             tracing::error!(
-                                "Failed to write trajectory {:} for {:}: {:}",
+                                "Failed to generate trajectory {:}: {:}",
                                 trajectory_name,
-                                project.name,
                                 e
                             );
                         }
                     }
-                }
-                Err(e) => {
-                    tracing::error!("Failed to generate trajectory {:}: {:}", trajectory_name, e);
-                }
+                }));
+            }
+            for i in threads {
+                i.await.expect("Should succeed");
             }
         }
+        // generate trajectories
+        // for (i, trajectory_name) in trajectory_names.iter().enumerate() {
+        //     tracing::info!(
+        //         "Generating trajectory {:} for {:}",
+        //         trajectory_name,
+        //         project.name
+        //     );
+        //
+        //     let trajectory =
+        //         file_management::read_trajectory_file(&resources, trajectory_name.to_string())
+        //             .await
+        //             .expect("Failed to read trajectory file");
+        //
+        //     match generate(project.clone(), trajectory, i as i64) {
+        //         Ok(new_trajectory) => {
+        //             match file_management::write_trajectory_file_immediately(
+        //                 &resources,
+        //                 new_trajectory,
+        //             )
+        //             .await
+        //             {
+        //                 Ok(_) => {
+        //                     tracing::info!(
+        //                         "Successfully generated trajectory {:} for {:}",
+        //                         trajectory_name,
+        //                         project.name
+        //                     );
+        //                 }
+        //                 Err(e) => {
+        //                     tracing::error!(
+        //                         "Failed to write trajectory {:} for {:}: {:}",
+        //                         trajectory_name,
+        //                         project.name,
+        //                         e
+        //                     );
+        //                 }
+        //             }
+        //         }
+        //         Err(e) => {
+        //             tracing::error!("Failed to generate trajectory {:}: {:}", trajectory_name, e);
+        //         }
+        //     }
+        // }
     }
 }
 
