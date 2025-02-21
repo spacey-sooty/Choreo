@@ -30,11 +30,16 @@ index 46a2e975b631269b552c3ab5963168a6813a1f5f..fe6158309e606583438d4aa22d00780f
 --- a/CMakeLists.txt
 +++ b/CMakeLists.txt
 @@ -114,6 +114,16 @@ endif()
-
+ 
  target_link_libraries(Sleipnir PUBLIC Eigen3::Eigen)
-
+ 
 +# fmt dependency
-+find_package(fmt REQUIRED)
++fetchcontent_declare(
++    fmt
++    GIT_REPOSITORY https://github.com/fmtlib/fmt.git
++    GIT_TAG 11.1.3
++)
++fetchcontent_makeavailable(fmt)
 +
 +target_link_libraries(Sleipnir PUBLIC fmt::fmt)
 +
@@ -48,7 +53,7 @@ index bab9de4de2c79abb3195cdd8b3a8b56da665e900..8caa4b1d7c7f4be463b2541fba915614
 @@ -22,7 +22,7 @@ macro(compiler_flags target)
          )
      endif()
-
+ 
 -    target_compile_features(${target} PUBLIC cxx_std_23)
 +    target_compile_features(${target} PUBLIC cxx_std_20)
      if(MSVC)
@@ -59,7 +64,7 @@ index 8fb61fdf9cc5ceff633d3126f0579eef25a1326f..6a7f8ed28f9cb037c9746a7e0ef5e110
 --- a/include/.styleguide
 +++ b/include/.styleguide
 @@ -12,4 +12,5 @@ licenseUpdateExclude {
-
+ 
  includeOtherLibs {
    ^Eigen/
 +  ^fmt/
@@ -70,16 +75,16 @@ index a746cb77b70f095bb15f4c493295cb925bc74cd3..484d1b2bec7148c5b9affccbf554c7df
 +++ b/include/sleipnir/util/Print.hpp
 @@ -3,52 +3,53 @@
  #pragma once
-
+ 
  #include <cstdio>
 -#include <print>
  #include <system_error>
  #include <utility>
-
+ 
 +#include <fmt/base.h>
 +
  namespace sleipnir {
-
+ 
  /**
 - * Wrapper around std::print() that squelches write failure exceptions.
 + * Wrapper around fmt::print() that squelches write failure exceptions.
@@ -93,7 +98,7 @@ index a746cb77b70f095bb15f4c493295cb925bc74cd3..484d1b2bec7148c5b9affccbf554c7df
    } catch (const std::system_error&) {
    }
  }
-
+ 
  /**
 - * Wrapper around std::print() that squelches write failure exceptions.
 + * Wrapper around fmt::print() that squelches write failure exceptions.
@@ -107,7 +112,7 @@ index a746cb77b70f095bb15f4c493295cb925bc74cd3..484d1b2bec7148c5b9affccbf554c7df
    } catch (const std::system_error&) {
    }
  }
-
+ 
  /**
 - * Wrapper around std::println() that squelches write failure exceptions.
 + * Wrapper around fmt::println() that squelches write failure exceptions.
@@ -121,7 +126,7 @@ index a746cb77b70f095bb15f4c493295cb925bc74cd3..484d1b2bec7148c5b9affccbf554c7df
    } catch (const std::system_error&) {
    }
  }
-
+ 
  /**
 - * Wrapper around std::println() that squelches write failure exceptions.
 + * Wrapper around fmt::println() that squelches write failure exceptions.
@@ -140,9 +145,9 @@ index 1abeb469a43d3d644efc1ad0e06e43928149ed0a..ae112430d7609356748b81d5dc4d0b5a
 --- a/include/sleipnir/util/Spy.hpp
 +++ b/include/sleipnir/util/Spy.hpp
 @@ -4,7 +4,10 @@
-
+ 
  #include <stdint.h>
-
+ 
 +#include <algorithm>
 +#include <array>
  #include <bit>
@@ -171,15 +176,15 @@ index 7b46202169d3d90eda16e76f3aff7f862e694079..44f5f9a31221397697638dd42b2968dc
  #include <ranges>
  #include <string>
 -#include <utility>
-
+ 
  #include "sleipnir/util/Print.hpp"
  #include "sleipnir/util/small_vector.hpp"
 @@ -54,7 +53,7 @@ void PrintIterationDiagnostics(int iterations, IterationMode mode,
-
+ 
    constexpr const char* kIterationModes[] = {" ", "s", "r"};
    sleipnir::print("{:4}{}  {:9.3f}  {:13e}  {:13e}  {:13e}  ", iterations,
 -                  kIterationModes[std::to_underlying(mode)],
 +                  kIterationModes[static_cast<uint8_t>(mode)],
                    ToMilliseconds(time), error, cost, infeasibility);
-
+ 
    // Print regularization
