@@ -21,6 +21,10 @@ if(NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE "RelWithDebInfo" CACHE STRING "" FORCE)
 endif()
 
+# Allow overriding options in parent projects
+cmake_policy(SET CMP0077 NEW)
+set(BUILD_TESTING OFF)
+
 include(FetchContent)
 fetchcontent_declare(
     Sleipnir
