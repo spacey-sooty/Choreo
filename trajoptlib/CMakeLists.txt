@@ -17,8 +17,8 @@ set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}")
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}")
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}")
 
-option(BUILD_EXAMPLES "Build examples" OFF)
 option(BUILD_SHARED_LIBS "Build using shared libraries" ON)
+option(TRAJOPT_BUILD_EXAMPLES "Build examples" OFF)
 
 file(GLOB_RECURSE TrajoptLib_src src/*.cpp)
 list(FILTER TrajoptLib_src EXCLUDE REGEX rust_ffi.cpp)
@@ -37,12 +37,12 @@ target_include_directories(
         $<INSTALL_INTERFACE:include>
 )
 
-if(BUILD_TESTING)
+if(PROJECT_IS_TOP_LEVEL AND BUILD_TESTING AND NOT CMAKE_CROSSCOMPILING)
     # Catch2 dependency
     FetchContent_Declare(
         Catch2
         GIT_REPOSITORY https://github.com/catchorg/Catch2.git
-        GIT_TAG v3.12.0
+        GIT_TAG v3.14.0
         GIT_SHALLOW ON
         EXCLUDE_FROM_ALL
         SYSTEM
@@ -50,23 +50,14 @@ if(BUILD_TESTING)
     FetchContent_MakeAvailable(Catch2)
 endif()
 
-set(BUILD_TESTING_SAVE ${BUILD_TESTING})
-set(BUILD_EXAMPLES_SAVE ${BUILD_EXAMPLES})
-
-set(BUILD_TESTING OFF)
-set(BUILD_EXAMPLES OFF)
-
 FetchContent_Declare(
     Sleipnir
     GIT_REPOSITORY https://github.com/SleipnirGroup/Sleipnir
-    GIT_TAG v0.4.0
+    GIT_TAG v0.5.4
     GIT_SHALLOW ON
     SYSTEM
 )
 FetchContent_MakeAvailable(Sleipnir)
-
-set(BUILD_TESTING ${BUILD_TESTING_SAVE})
-set(BUILD_EXAMPLES ${BUILD_EXAMPLES_SAVE})
 
 target_link_libraries(TrajoptLib PUBLIC Sleipnir::Sleipnir)
 
@@ -103,14 +94,14 @@ install(
     DESTINATION lib/cmake/TrajoptLib
 )
 
-if(BUILD_TESTING)
+if(PROJECT_IS_TOP_LEVEL AND BUILD_TESTING AND NOT CMAKE_CROSSCOMPILING)
     enable_testing()
     list(APPEND CMAKE_MODULE_PATH ${Catch2_SOURCE_DIR}/extras)
     include(Catch)
 endif()
 get_cmake_property(IS_MULTI_CONFIG GENERATOR_IS_MULTI_CONFIG)
 # Build TrajoptLib tests
-if(BUILD_TESTING)
+if(PROJECT_IS_TOP_LEVEL AND BUILD_TESTING AND NOT CMAKE_CROSSCOMPILING)
     file(GLOB_RECURSE trajoptlib_test_src test/src/*.cpp)
     add_executable(trajoptlib_test ${trajoptlib_test_src})
     compiler_flags(trajoptlib_test)
@@ -128,7 +119,7 @@ if(BUILD_TESTING)
 endif()
 
 # Build examples and example tests
-if(BUILD_EXAMPLES)
+if(TRAJOPT_BUILD_EXAMPLES)
     include(SubdirList)
     subdir_list(EXAMPLES ${CMAKE_CURRENT_SOURCE_DIR}/examples)
     foreach(example ${EXAMPLES})
@@ -144,7 +135,8 @@ if(BUILD_EXAMPLES)
 
         # Build example test if files exist for it
         if(
-            BUILD_TESTING
+            PROJECT_IS_TOP_LEVEL
+            AND BUILD_TESTING
             AND EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/examples/${example}/test
         )
             file(GLOB_RECURSE test_sources examples/${example}/test/*.cpp)
