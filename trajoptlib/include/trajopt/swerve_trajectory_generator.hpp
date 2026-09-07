@@ -28,6 +28,8 @@ struct TRAJOPT_DLLEXPORT SwerveDrivetrain {
   /// Radius of the wheels (m).
   double wheel_radius;
 
+  /// The motor model of each drive wheel. All quantities are wheel-referenced
+  /// (motor constants scaled by the gear ratio).
   util::MotorConfig motor_config;
 
   /// The Coefficient of Friction (CoF) of the wheels.
