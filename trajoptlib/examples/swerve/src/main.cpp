@@ -24,20 +24,21 @@ int main() {
       // m
       .wheel_radius = 0.04,
       // wheel-referenced (motor constants scaled by gearing)
-      .motor_config = {// rad/s
-                       .free_speed = 70,
-                       // N-m
-                       .stall_torque = 63,
-                       // N-m/A
-                       .kT = 0.133,
-                       // V/(rad/s)
-                       .kV = 0.133,
-                       // V
-                       .kS = 0.4,
-                       // A
-                       .supply_limit = 60,
-                       // A
-                       .stator_limit = 120},
+      .motor_config =
+          {// rad/s
+           .free_speed = 70,
+           // N-m
+           .stall_torque = 63,
+           // N-m/A
+           .kT = 0.133,
+           // V/(rad/s)
+           .kV = 0.133,
+           // V
+           .kS = 0.4,
+           // A
+           .supply_limit = 60,
+           // A
+           .stator_limit = 120},
       // unitless
       .wheel_cof = 1.5,
       // m

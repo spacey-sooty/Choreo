@@ -12,7 +12,7 @@
 
 #include "trajopt/geometry/translation2.hpp"
 #include "trajopt/path/path_builder.hpp"
-#include "trajopt/util/motor.hpp"
+#include "trajopt/motor.hpp"
 #include "trajopt/util/symbol_exports.hpp"
 
 namespace trajopt {
@@ -30,7 +30,7 @@ struct TRAJOPT_DLLEXPORT SwerveDrivetrain {
 
   /// The motor model of each drive wheel. All quantities are wheel-referenced
   /// (motor constants scaled by the gear ratio).
-  util::MotorConfig motor_config;
+  MotorConfig motor_config;
 
   /// The Coefficient of Friction (CoF) of the wheels.
   double wheel_cof;

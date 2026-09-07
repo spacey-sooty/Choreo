@@ -2,7 +2,7 @@
 
 #pragma once
 
-namespace trajopt::util {
+namespace trajopt {
 
 /// A DC motor model for a single drive wheel.
 ///

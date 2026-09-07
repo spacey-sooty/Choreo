@@ -38,13 +38,13 @@ export interface Bumper<T extends ExprOrNumber> {
 }
 
 export interface MotorConfig<T extends ExprOrNumber> {
-    free_speed: T;
-    stall_torque: T;
-    kT: T;
-    kV: T;
-    kS: T;
-    supply_limit: T;
-    stator_limit: T;
+  free_speed: T;
+  stall_torque: T;
+  kT: T;
+  kV: T;
+  kS: T;
+  supply_limit: T;
+  stator_limit: T;
 }
 
 export interface Module<T extends ExprOrNumber> {

@@ -88,7 +88,7 @@ export const Units = {
   NewtonMeterPerAmp: math.unit("N*m/A"),
   Volt: math.unit("V"),
   VoltPerRPM: math.unit("V/RPM"),
-  VoltPerRadPerSec: math.unit("V / (rad / s)"),
+  VoltPerRadPerSec: math.unit("V / (rad / s)")
 };
 // not sure why the alias above doesn't work
 math.createUnit("rpm", "1 RPM");
@@ -214,7 +214,7 @@ export const Dimensions = {
     name: "Voltage per angular velocity",
     unit: Units.VoltPerRadPerSec,
     icon: () => <Straighten></Straighten>
-  },
+  }
 } as const satisfies {
   [key in DimensionName]: Dimension<key>;
 };

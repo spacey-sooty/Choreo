@@ -57,11 +57,14 @@ export const EXPR_DEFAULTS: RobotConfig<Expr> = {
     stall_torque: { exp: "9.36 N * m", val: 9.36 },
     free_speed: { exp: "5800 RPM", val: (5800.0 / 60.0) * 2 * Math.PI },
     kT: { exp: "0.0197 N * m / A", val: 0.0197 },
-    kV: { exp: "0.00206896552 V / RPM", val: 0.00206896552 * 60 / (2 * Math.PI) },
+    kV: {
+      exp: "0.00206896552 V / RPM",
+      val: (0.00206896552 * 60) / (2 * Math.PI)
+    },
     kS: { exp: "0.4 V", val: 0.4 },
     supply_limit: { exp: "60 A", val: 60.0 },
     stator_limit: { exp: "120 A", val: 120.0 }
-  },
+  }
 };
 
 // When adding new fields, consult
@@ -114,7 +117,7 @@ export const MotorConfigStore = types
     kV: ExpressionStore,
     kS: ExpressionStore,
     supply_limit: ExpressionStore,
-    stator_limit: ExpressionStore,
+    stator_limit: ExpressionStore
   })
   .views((self) => ({
     get serialize(): MotorConfig<Expr> {
@@ -138,7 +141,7 @@ export const MotorConfigStore = types
         supply_limit: self.supply_limit.value,
         stator_limit: self.stator_limit.value
       };
-    },
+    }
   }))
   .actions((self) => ({
     deserialize(ser: MotorConfig<Expr>) {
@@ -151,8 +154,6 @@ export const MotorConfigStore = types
       self.stator_limit.deserialize(ser.stator_limit);
     }
   }));
-
-
 
 // When adding new fields, consult
 // https://choreo.autos/contributing/schema-upgrade/
